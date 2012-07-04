@@ -26,6 +26,10 @@ if [ -z "$PROPEL_GEN_HOME" ] ; then
         PROPEL_GEN_HOME="`pwd`/generator"
     fi
 
+    if [ -d "`pwd`/thirdparty/propel/generator" ] ; then
+        PROPEL_GEN_HOME="`pwd`/thirdparty/propel/generator"
+    fi
+
     export PROPEL_GEN_HOME
 fi
 
