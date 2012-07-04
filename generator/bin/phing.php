@@ -12,6 +12,7 @@
 // Set any INI options for PHP
 // ---------------------------
 
+set_include_path(get_include_path() . PATH_SEPARATOR . '/usr/local/Cellar/php/5.3.10/lib/php');
 $dirname = dirname(__FILE__);
 $autoloaded = false;
 foreach (array($dirname . '/../../', $dirname . '/../../../../../') as $dir) {
