@@ -1756,16 +1756,24 @@ class Criteria implements IteratorAggregate
      */
     public function addAnd($p1, $value = null, $comparison = null, $preferColumnCondition = true)
     {
-        $criterion = $this->getCriterionForCondition($p1, $value, $comparison);
+        $rightCriterion = $this->getCriterionForCondition($p1, $value, $comparison);
 
-        $key = $criterion->getTable() . '.' . $criterion->getColumn();
+        $key = $rightCriterion->getTable() . '.' . $rightCriterion->getColumn();
         if ($preferColumnCondition && $this->containsKey($key)) {
             // FIXME: addAnd() operates preferably on existing conditions on the same column
             // this may cause unexpected results, but it's there for BC with Propel 14
-            $this->getCriterion($key)->addAnd($criterion);
+            $leftCriterion = $this->getCriterion($key);
         } else {
-            // simply add the condition to the list - this is the expected behavior
-            $this->add($criterion);
+            // fallback to the latest condition - this is the expected behavior
+            $leftCriterion = $this->getLastCriterion();
+        }
+
+        if ($leftCriterion !== null) {
+            // combine the given criterion with the existing one with an 'AND'
+            $leftCriterion->addAnd($rightCriterion);
+        } else {
+            // nothing to do OR / AND with, so make it first condition
+            $this->add($rightCriterion);
         }
 
         return $this;
