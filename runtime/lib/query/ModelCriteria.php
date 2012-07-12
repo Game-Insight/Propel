@@ -1207,7 +1207,18 @@ class ModelCriteria extends Criteria
         if (!$ret = $this->findOne($con)) {
             $class = $this->getModelName();
             $obj = new $class();
+	        $processCriterionClosure = function(\Criterion $criterion) use (&$processCriterionClosure, $obj) {
+		        foreach ($criterion->getClauses() as $index => $subCriterion) {
+			        $conjunctions = $criterion->getConjunctions();
+			        if ($conjunctions[$index] === Criterion::UND && $subCriterion->getComparison() === Criteria::EQUAL) {
+				        $processCriterionClosure($subCriterion);
+				        $obj->setByName($subCriterion->getTable() . '.' . $subCriterion->getColumn(),
+					        $subCriterion->getValue(), BasePeer::TYPE_COLNAME);
+			        }
+		        }
+	        };
             foreach ($this->keys() as $key) {
+		        $processCriterionClosure($this->getCriterion($key));
                 $obj->setByName($key, $this->getValue($key), BasePeer::TYPE_COLNAME);
             }
             $ret = $this->getFormatter()->formatRecord($obj);
