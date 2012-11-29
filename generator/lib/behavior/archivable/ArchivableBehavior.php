@@ -30,6 +30,8 @@ class ArchivableBehavior extends Behavior
         'archive_on_insert'   => 'false',
         'archive_on_update'   => 'false',
         'archive_on_delete'   => 'true',
+        'ignore_indexes'      => 'false',
+        'ignore_unique'       => 'false',
     );
 
     protected $archiveTable;
@@ -97,20 +99,24 @@ class ArchivableBehavior extends Behavior
             }
             // do not copy foreign keys
             // copy the indices
-            foreach ($table->getIndices() as $index) {
-                $copiedIndex = clone $index;
-                $copiedIndex->setName('');
-                $archiveTable->addIndex($copiedIndex);
+            if ($this->getParameter('ignore_indexes') !== 'true') {
+                foreach ($table->getIndices() as $index) {
+                    $copiedIndex = clone $index;
+                    $copiedIndex->setName('');
+                    $archiveTable->addIndex($copiedIndex);
+                }
             }
             // copy unique indices to indices
             // see https://github.com/propelorm/Propel/issues/175 for details
-            foreach ($table->getUnices() as $unique) {
-                $index = new Index();
-                foreach ($unique->getColumns() as $columnName) {
-                    if ($size = $unique->getColumnSize($columnName)) {
-                        $index->addColumn(array('name' => $columnName, 'size' => $size));
-                    } else {
-                        $index->addColumn(array('name' => $columnName));
+            if ($this->getParameter('ignore_unique') !== 'true') {
+                foreach ($table->getUnices() as $unique) {
+                    $index = new Index();
+                    foreach ($unique->getColumns() as $columnName) {
+                        if ($size = $unique->getColumnSize($columnName)) {
+                            $index->addColumn(array('name' => $columnName, 'size' => $size));
+                        } else {
+                            $index->addColumn(array('name' => $columnName));
+                        }
                     }
                 }
                 $archiveTable->addIndex($index);
