@@ -292,6 +292,10 @@ class XmlToAppData
                     $this->currVendorObject = $this->currIndex->addVendorInfo($attributes);
                 break;
 
+	            case "where":
+		            $this->currIndex->addPartialCondition($attributes);
+		        break;
+
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
@@ -306,6 +310,10 @@ class XmlToAppData
                 case "vendor":
                     $this->currVendorObject = $this->currUnique->addVendorInfo($attributes);
                 break;
+
+	            case "where":
+		            $this->currUnique->addPartialCondition($attributes);
+		            break;
 
                 default:
                     $this->_throwInvalidTagException($parser, $name);

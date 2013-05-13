@@ -296,7 +296,10 @@ DROP TABLE " . $this->quoteIdentifier($table->getName()) . ";
         }
 
         foreach ($table->getUnices() as $unique) {
-            $lines[] = $this->getUniqueDDL($unique);
+	        /** @var Unique $unique */
+	        if (!$unique->isPartial()) {
+                $lines[] = $this->getUniqueDDL($unique);
+	        }
         }
 
         $sep = ",
@@ -476,6 +479,13 @@ ALTER TABLE %s ADD %s;
             $ret .= $this->getAddIndexDDL($fk);
         }
 
+	    foreach ($table->getUnices() as $index) {
+		    /** @var Index $index */
+		    if ($index->isPartial()) {
+			    $ret .= $this->getAddIndexDDL($index);
+		    }
+	    }
+
         return $ret;
     }
 
@@ -487,16 +497,23 @@ ALTER TABLE %s ADD %s;
      */
     public function getAddIndexDDL(Index $index)
     {
-        $pattern = "
-CREATE %sINDEX %s ON %s (%s);
-";
+        $pattern = "\nCREATE %sINDEX %s ON %s (%s)";
 
-        return sprintf($pattern,
-            $index->getIsUnique() ? 'UNIQUE ' : '',
-            $this->quoteIdentifier($index->getName()),
-            $this->quoteIdentifier($index->getTable()->getName()),
-            $this->getColumnListDDL($index->getColumns())
-        );
+		$result = sprintf($pattern,
+			$index->getIsUnique() ? 'UNIQUE ' : '',
+			$this->quoteIdentifier($index->getName()),
+			$this->quoteIdentifier($index->getTable()->getName()),
+			$this->getColumnListDDL($index->getColumns())
+		);
+
+		$partialConditions = $index->getPartialConditions();
+		if ($partialConditions != '') {
+			$result .= ' WHERE ' . $partialConditions;
+		}
+
+	    $result .= ';' . PHP_EOL;
+
+        return $result;
     }
 
     /**
@@ -524,11 +541,18 @@ DROP INDEX %s;
      */
     public function getIndexDDL(Index $index)
     {
-        return sprintf('%sINDEX %s (%s)',
+        $result = sprintf('%sINDEX %s (%s)',
             $index->getIsUnique() ? 'UNIQUE ' : '',
             $this->quoteIdentifier($index->getName()),
             $this->getColumnListDDL($index->getColumns())
         );
+
+		$partialConditions = $index->getPartialConditions();
+		if ($partialConditions != '') {
+			$result .= ' WHERE ' . $partialConditions;
+		}
+
+		return $result;
     }
 
     /**

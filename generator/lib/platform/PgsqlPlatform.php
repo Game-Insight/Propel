@@ -233,7 +233,10 @@ SET search_path TO public;
         }
 
         foreach ($table->getUnices() as $unique) {
-            $lines[] = $this->getUniqueDDL($unique);
+	        /** @var Unique $unique */
+	        if (!$unique->isPartial()) {
+		        $lines[] = $this->getUniqueDDL($unique);
+	        }
         }
 
         $sep = ",

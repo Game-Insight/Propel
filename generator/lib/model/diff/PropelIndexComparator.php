@@ -54,6 +54,11 @@ class PropelIndexComparator
             return true;
         }
 
+	    // Check for defference in partial
+	    if ($fromIndex->isPartial() != $toIndex->isPartial()) {
+		    return true;
+	    }
+
         return false;
     }
 
