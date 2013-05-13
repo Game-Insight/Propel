@@ -38,6 +38,9 @@ class Index extends XMLElement
     /** @var int[] */
     private $indexColumnSizes = array();
 
+	/** @var        array string[] */
+	private $indexPartialConditions = array();
+
     /**
      * Creates a new Index instance.
      *
@@ -335,4 +338,36 @@ class Index extends XMLElement
             $vi->appendXml($idxNode);
         }
     }
+
+	/**
+	 * Add condition to partial index
+	 *
+	 * @param array $attributes that has key 'condition'
+	 */
+	public function addPartialCondition($attributes) {
+		$this->indexPartialConditions[] = $attributes['condition'];
+	}
+
+	/**
+	 * Set conditions for partial index
+	 *
+	 * @param array string[] $conditions
+	 */
+	public function setPartialConditions(array $conditions) {
+		$this->indexPartialConditions = $conditions;
+	}
+
+	/**
+	 * @return string that is joined conditions using AND
+	 */
+	public function getPartialConditions() {
+		return implode(' AND ', $this->indexPartialConditions);
+	}
+
+	/**
+	 * @return bool if index is partial or not
+	 */
+	public function isPartial() {
+		return !$this->getPartialConditions() == '';
+	}
 }

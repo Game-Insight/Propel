@@ -272,6 +272,7 @@
         <xs:choice maxOccurs="unbounded">
             <xs:element name="unique-column" type="unique-column" minOccurs="1" maxOccurs="unbounded"/>
             <xs:element ref="vendor" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="where" minOccurs="0" maxOccurs="1" type="where-condition" />
         </xs:choice>
         <xs:attribute name="name" type="index_name" use="optional"/>
     </xs:complexType>
@@ -290,6 +291,10 @@
         </xs:sequence>
         <xs:attribute name="name" type="column_name" use="required"/>
         <xs:attribute name="size" type="xs:positiveInteger" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="where-condition">
+        <xs:attribute name="condition" type="xs:string" use="required"/>
     </xs:complexType>
 
     <xs:complexType name="inheritance">
