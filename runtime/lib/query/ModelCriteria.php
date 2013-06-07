@@ -1759,8 +1759,24 @@ class ModelCriteria extends Criteria
 
             // update rows in a single query
             $set = new Criteria($this->getDbName());
+
+            // get all ENUMs sets
+	        if (method_exists($this->modelPeerName, 'getValueSets')) {
+				$valueSets = call_user_func(array($this->modelPeerName, 'getValueSets'));
+	        }
+
             foreach ($values as $columnName => $value) {
                 $realColumnName = $this->getTableMap()->getColumnByPhpName($columnName)->getFullyQualifiedName();
+
+                // Work with ENUMs
+                if ($value !== null && isset($valueSets[$realColumnName])) {
+                    $dbValue = array_search($value, $valueSets[$realColumnName]);
+                    if (false === $dbValue) {
+                        throw new PropelException(sprintf('Value "%s" is not accepted in enumerated column "%s"', $value, $columnName));
+                    }
+                    $value = $dbValue;
+                }
+
                 $set->add($realColumnName, $value);
             }
             $affectedRows = BasePeer::doUpdate($this, $set, $con);
