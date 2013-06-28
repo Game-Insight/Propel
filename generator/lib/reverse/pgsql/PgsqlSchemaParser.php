@@ -443,7 +443,8 @@ class PgsqlSchemaParser extends BaseSchemaParser
                                         DISTINCT ON(cls.relname)
                                         cls.relname as idxname,
                                         indkey,
-                                        indisunique
+                                        indisunique,
+                                        indpred
                                     FROM pg_index idx
                                          JOIN pg_class cls ON cls.oid=indexrelid
                                     WHERE indrelid = ? AND NOT indisprimary
@@ -483,6 +484,10 @@ class PgsqlSchemaParser extends BaseSchemaParser
 
             } // foreach ($arrColumns as $intColNum)
 
+	        // TODO: downSQL will be incorrect in case of partial index
+	        // because there is no way to retrieve index condition from DB
+	        // "indpred" column is just indicated index is partial
+	        $indexes[$name]->setPartialConditions(array($row['indpred']));
         }
 
     }
