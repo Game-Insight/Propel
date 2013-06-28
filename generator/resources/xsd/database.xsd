@@ -264,6 +264,7 @@
         <xs:choice maxOccurs="unbounded">
             <xs:element name="index-column" type="index-column" minOccurs="1" maxOccurs="unbounded"/>
             <xs:element ref="vendor" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="where" minOccurs="0" maxOccurs="1" type="where-condition" />
         </xs:choice>
         <xs:attribute name="name" type="index_name" use="optional"/>
     </xs:complexType>
