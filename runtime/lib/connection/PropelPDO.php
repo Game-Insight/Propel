@@ -90,6 +90,13 @@ class PropelPDO extends PDO
      */
     public $useDebug = false;
 
+	/**
+	 * Count the number of queries?
+	 *
+	 * @var bool
+	 */
+	public $useQueryCount = true;
+
     /**
      * Configured BasicLogger (or compatible) logger.
      *
@@ -154,7 +161,9 @@ class PropelPDO extends PDO
         if ($this->useDebug) {
             $this->configureStatementClass('DebugPDOStatement', true);
             $this->log('Opening connection', null, __METHOD__, $debug);
-        }
+        } elseif ($this->useQueryCount) {
+			$this->configureStatementClass('DebugCountPDOStatement', true);
+		}
     }
 
     /**
@@ -429,7 +438,9 @@ class PropelPDO extends PDO
             $this->log($sql, null, __METHOD__, $debug);
             $this->setLastExecutedQuery($sql);
             $this->incrementQueryCount();
-        }
+        } else if ($this->useQueryCount) {
+			$this->incrementQueryCount();
+		}
 
         return $return;
     }
@@ -462,7 +473,9 @@ class PropelPDO extends PDO
             $this->log($sql, null, __METHOD__, $debug);
             $this->setLastExecutedQuery($sql);
             $this->incrementQueryCount();
-        }
+        } else if ($this->useQueryCount) {
+			$this->incrementQueryCount();
+		}
 
         return $return;
     }
@@ -562,6 +575,15 @@ class PropelPDO extends PDO
         $this->clearStatementCache();
         $this->useDebug = $value;
     }
+
+	/**
+	 * Enable/disable query counting.
+	 *
+	 * @param bool $value
+	 */
+	public function debugQueryCount($value = true) {
+		$this->useQueryCount = $value;
+	}
 
     /**
      * Sets the logging level to use for logging method calls and SQL statements.
