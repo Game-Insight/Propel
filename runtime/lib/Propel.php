@@ -186,6 +186,7 @@ class Propel
 
         'PropelPDO'           => 'connection/PropelPDO.php',
         'DebugPDO'            => 'connection/DebugPDO.php',
+        'DebugCountPDOStatement'   => 'connection/DebugCountPDOStatement.php',
         'DebugPDOStatement'   => 'connection/DebugPDOStatement.php',
 
         'PropelException'     => 'exception/PropelException.php',
