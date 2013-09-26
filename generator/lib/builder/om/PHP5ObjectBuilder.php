@@ -997,7 +997,8 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
             $script .= "
 
         try {
-            \$dt = new $dateTimeClass(\$this->$clo);
+            \$dt = new $dateTimeClass(\$this->$clo, new DateTimeZone('UTC'));
+            \$dt->setTimezone(new DateTimeZone(date_default_timezone_get()));
         } catch (Exception \$x) {
             throw new PropelException(\"Internally stored date/time/timestamp value could not be converted to $dateTimeClass: \" . var_export(\$this->$clo, true), \$x);
         }
@@ -1697,6 +1698,22 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
         $fmt = var_export($this->getTemporalFormatter($col), true);
 
         $script .= "
+
+        if (\$v === null || \$v === '') {
+			return null;
+		}
+
+		// We store dates in UTC in DB, that's why we have to convert them
+		\$timeZone = date_default_timezone_get();
+		if (\$timeZone !== 'UTC') {
+			if (\$v instanceof DateTime) {
+				\$v = clone(\$v);
+			} else {
+				\$v = PropelDateTime::newInstance(\$v, new DateTimeZone(date_default_timezone_get()), 'DateTime');
+			}
+			\$v->setTimezone(new DateTimeZone('UTC'));
+		}
+
         \$dt = PropelDateTime::newInstance(\$v, null, '$dateTimeClass');
         if (\$this->$clo !== null || \$dt !== null) {
             \$currentDateAsString = (\$this->$clo !== null && \$tmpDt = new $dateTimeClass(\$this->$clo)) ? \$tmpDt->format($fmt) : null;
