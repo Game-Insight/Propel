@@ -1554,13 +1554,15 @@ abstract class ".$this->getClassname()." extends ".$parentClass." ";
 
         $script .= "
 
-        if (\$v === null || \$v === '') {
+		\$vIsEmpty = \$v === null || \$v === '';
+
+        if (\$vIsEmpty && \$this->end_date === null) {
 			return null;
 		}
 
 		// We store dates in UTC in DB, that's why we have to convert them
 		\$timeZone = date_default_timezone_get();
-		if (\$timeZone !== 'UTC') {
+		if (\$timeZone !== 'UTC' && !\$vIsEmpty) {
 			if (\$v instanceof DateTime) {
 				\$v = clone(\$v);
 			} else {
