@@ -1556,8 +1556,8 @@ abstract class ".$this->getClassname()." extends ".$parentClass." ";
 
 		\$vIsEmpty = \$v === null || \$v === '';
 
-        if (\$vIsEmpty && \$this->end_date === null) {
-			return null;
+        if (\$vIsEmpty && \$this->$clo === null) {
+			return \$this;
 		}
 
 		// We store dates in UTC in DB, that's why we have to convert them
