@@ -382,6 +382,15 @@ class Propel
         return self::$configuration->getParameters($type);
     }
 
+	/**
+	 * Get connection map.
+	 *
+	 * @return array
+	 */
+	public static function getConnectionMap() {
+		return self::$connectionMap;
+	}
+
     /**
      * Override the configured logger.
      *
