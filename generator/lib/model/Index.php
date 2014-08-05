@@ -333,6 +333,26 @@ class Index extends XMLElement
 	 * @param array $attributes that has key 'condition'
 	 */
 	public function addPartialCondition($attributes) {
+		foreach ($attributes as &$attr) {
+			$parts  = explode(' ', $attr);
+			$column = $this->parentTable->getColumn($parts[0], true);
+
+			if ($column->isEnumType()) {
+				$lastKey = count($parts) - 1;
+				$values = explode(',', str_replace('\'', '', $parts[$lastKey]));
+
+				$valueSetFlipped = array_flip($column->getValueSet());
+
+				foreach ($values as &$val) {
+					$val = $valueSetFlipped[$val];
+				}
+
+				$parts[$lastKey] = join(',', $values);
+			};
+
+			$attr = join(' ', $parts);
+		}
+
 		$this->indexPartialConditions[] = $attributes['condition'];
 	}
 
