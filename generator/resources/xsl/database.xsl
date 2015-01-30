@@ -165,6 +165,8 @@
 		<behavior>
 			<xsl:apply-templates select='@*'/>
 			<xsl:apply-templates select='parameter'/>
+			<xsl:apply-templates select='index'/>
+			<xsl:apply-templates select='unique'/>
 		</behavior>
 	</xsl:template>
 

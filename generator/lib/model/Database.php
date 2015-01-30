@@ -507,7 +507,7 @@ class Database extends ScopedElement
 
   /**
    * Get the database behaviors
-   * @return Array of Behavior objects
+   * @return Behavior[] Array of Behavior objects
    */
   public function getBehaviors()
   {

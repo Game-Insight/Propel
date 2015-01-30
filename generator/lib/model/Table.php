@@ -64,16 +64,30 @@ class Table extends ScopedElement implements IDMethod
     /**
      * Indexes for this table.
      *
-     * @var       array Index[]
+     * @var Index[]
      */
     private $indices = array();
 
     /**
+     * Indexes for archive table.
+     *
+     * @var Index[]
+     */
+    private $archiveIndices = array();
+
+    /**
      * Unique indexes for this table.
      *
-     * @var       array Unique[]
+     * @var Unique[]
      */
     private $unices = array();
+
+    /**
+     * Unique indexes for archive table.
+     *
+     * @var Unique[]
+     */
+    private $archiveUnices = array();
 
     /**
      * Any parameters for the ID method (currently supports changing sequence name).
@@ -1034,6 +1048,27 @@ class Table extends ScopedElement implements IDMethod
     }
 
     /**
+     * Adds a new index to the archive index list and set the
+     * parent table of the column to the current table
+     */
+    public function addArchiveIndex($idxdata)
+    {
+        if ($idxdata instanceof Index) {
+            $index = $idxdata;
+            $index->setTable($this);
+            $index->getName(); // we call this method so that the name is created now if it doesn't already exist.
+            $this->archiveIndices[] = $index;
+
+            return $index;
+        } else {
+            $index = new Index($this);
+            $index->loadFromXML($idxdata);
+
+            return $this->addArchiveIndex($index);
+        }
+    }
+
+    /**
      * Adds a new Unique to the Unique list and set the
      * parent table of the column to the current table
      */
@@ -1051,6 +1086,27 @@ class Table extends ScopedElement implements IDMethod
             $unique->loadFromXML($unqdata);
 
             return $this->addUnique($unique);
+        }
+    }
+
+    /**
+     * Adds a new Unique to the archive Unique list and set the
+     * parent table of the column to the current table
+     */
+    public function addArchiveUnique($unqdata)
+    {
+        if ($unqdata instanceof Unique) {
+            $unique = $unqdata;
+            $unique->setTable($this);
+            $unique->getName(); // we call this method so that the name is created now if it doesn't already exist.
+            $this->archiveUnices[] = $unique;
+
+            return $unique;
+        } else {
+            $unique = new Unique($this);
+            $unique->loadFromXML($unqdata);
+
+            return $this->addArchiveUnique($unique);
         }
     }
 
@@ -1456,7 +1512,7 @@ class Table extends ScopedElement implements IDMethod
 
     /**
      * Returns an Array containing all the columns in the table
-     * @return array Column[]
+     * @return Column[]
      */
     public function getColumns()
     {
@@ -1530,7 +1586,7 @@ class Table extends ScopedElement implements IDMethod
 
     /**
      * Returns an Array containing all the FKs in the table
-     * @return array Index[]
+     * @return Index[]
      */
     public function getIndices()
     {
@@ -1538,12 +1594,30 @@ class Table extends ScopedElement implements IDMethod
     }
 
     /**
+     * Returns an Array containing all the archive indexes in the table
+     * @return Index[]
+     */
+    public function getArchiveIndices()
+    {
+        return $this->archiveIndices;
+    }
+
+    /**
      * Returns an Array containing all the UKs in the table
-     * @return array Unique[]
+     * @return Unique[]
      */
     public function getUnices()
     {
         return $this->unices;
+    }
+
+    /**
+     * Returns an Array containing all the archive UKs in the table
+     * @return Unique[]
+     */
+    public function getArchiveUnices()
+    {
+        return $this->archiveUnices;
     }
 
     /**
@@ -1802,7 +1876,15 @@ class Table extends ScopedElement implements IDMethod
             $index->appendXml($tableNode);
         }
 
+        foreach ($this->archiveIndices as $index) {
+            $index->appendXml($tableNode);
+        }
+
         foreach ($this->unices as $unique) {
+            $unique->appendXml($tableNode);
+        }
+
+        foreach ($this->archiveUnices as $unique) {
             $unique->appendXml($tableNode);
         }
 
