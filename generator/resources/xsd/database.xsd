@@ -313,6 +313,20 @@
     <xs:complexType name="behavior">
         <xs:choice maxOccurs="unbounded">
             <xs:element name="parameter" type="parameter" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="index" type="index" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        An index on one or several columns of the current table
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="unique" type="unique" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        A unique index on one or several columns of the current table
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:choice>
         <xs:attribute name="name" type="xs:string" use="required"/>
     </xs:complexType>

@@ -97,9 +97,33 @@ class ArchivableBehavior extends Behavior
                     'type' => 'TIMESTAMP'
                 ));
             }
+
+            // If we have a manually provided list of indices, ignore "ignore_indexes"
+            // and "ignore_unique" parameters.
+            $archiveIndices = $table->getArchiveIndices();
+            $archiveUnices = $table->getArchiveUnices();
+
+            foreach ($archiveIndices as $index) {
+                $copiedIndex = clone $index;
+                $copiedIndex->setName('');
+                $archiveTable->addIndex($copiedIndex);
+            }
+
+            foreach ($archiveUnices as $unique) {
+                $index = new Index();
+                foreach ($unique->getColumns() as $columnName) {
+                    if ($size = $unique->getColumnSize($columnName)) {
+                        $index->addColumn(array('name' => $columnName, 'size' => $size));
+                    } else {
+                        $index->addColumn(array('name' => $columnName));
+                    }
+                }
+                $archiveTable->addIndex($index);
+            }
+
             // do not copy foreign keys
             // copy the indices
-            if ($this->getParameter('ignore_indexes') !== 'true') {
+            if (count($archiveIndices) == 0 && $this->getParameter('ignore_indexes') !== 'true') {
                 foreach ($table->getIndices() as $index) {
                     $copiedIndex = clone $index;
                     $copiedIndex->setName('');
@@ -108,7 +132,7 @@ class ArchivableBehavior extends Behavior
             }
             // copy unique indices to indices
             // see https://github.com/propelorm/Propel/issues/175 for details
-            if ($this->getParameter('ignore_unique') !== 'true') {
+            if (count($archiveUnices) == 0 && $this->getParameter('ignore_unique') !== 'true') {
                 foreach ($table->getUnices() as $unique) {
                     $index = new Index();
                     foreach ($unique->getColumns() as $columnName) {
@@ -118,8 +142,8 @@ class ArchivableBehavior extends Behavior
                             $index->addColumn(array('name' => $columnName));
                         }
                     }
+                    $archiveTable->addIndex($index);
                 }
-                $archiveTable->addIndex($index);
             }
             // every behavior adding a table should re-execute database behaviors
             foreach ($database->getBehaviors() as $behavior) {

@@ -29,14 +29,23 @@ class XmlToAppData
     const DEBUG = false;
 
     private $app;
+    /** @var Database */
     private $currDB;
+    /** @var Table */
     private $currTable;
+    /** @var Column */
     private $currColumn;
+    /** @var ForeignKey */
     private $currFK;
+    /** @var Index */
     private $currIndex;
+    /** @var Unique */
     private $currUnique;
+    /** @var Validator */
     private $currValidator;
+    /** @var Behavior */
     private $currBehavior;
+    /** @var VendorInfo */
     private $currVendorObject;
 
     private $isForReferenceOnly;
@@ -322,6 +331,18 @@ class XmlToAppData
             switch ($name) {
                 case "parameter":
                     $this->currBehavior->addParameter($attributes);
+                    break;
+
+                case "index":
+                    if ($this->currBehavior instanceof ArchivableBehavior) {
+                        $this->currIndex = $this->currTable->addArchiveIndex($attributes);
+                    }
+                    break;
+
+                case "unique":
+                    if ($this->currBehavior instanceof ArchivableBehavior) {
+                        $this->currUnique = $this->currTable->addArchiveUnique($attributes);
+                    }
                     break;
 
                 default:
