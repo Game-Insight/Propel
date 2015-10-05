@@ -13,8 +13,7 @@
     "classmap": ["runtime/lib/"]
   },
   "require": {
-    "php": ">=5.2.4",
-    "phing/phing": ">=2.4.12,2.4.*"
+    "php": ">=5.2.4"
   },
   "extra": {
     "branch-alias": {
