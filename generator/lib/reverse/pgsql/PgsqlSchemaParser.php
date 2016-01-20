@@ -176,7 +176,7 @@ class PgsqlSchemaParser extends BaseSchemaParser
                                         att.atthasdef,
                                         att.attnotnull,
                                         def.adsrc,
-                                        CASE WHEN att.attndims > 0 THEN 1 ELSE 0 END AS isarray,
+                                        0 AS isarray,
                                         CASE
                                             WHEN ty.typname = 'bpchar'
                                                 THEN 'char'
